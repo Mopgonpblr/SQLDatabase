@@ -1,46 +1,57 @@
-import dao.TicketDao;
-import dao.UserDao;
+import entities.Ticket;
+import entities.User;
 import enums.TicketType;
+import service.TicketService;
+import service.UserService;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.util.List;
 
 public class Postgresqldb {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
-        String jdbcUrl = "jdbc:postgresql://localhost:5432/my_ticket_service_db";
-        String username = "username";
-        String password = "password";
 
-        Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
-        UserDao userDao = new UserDao(connection);
-        TicketDao ticketDao = new TicketDao(connection);
+        User user = new User(1, "USER1");
+        Ticket ticket1 = new Ticket(1,1,TicketType.DAY);
+        Ticket ticket2 = new Ticket(2,1,TicketType.YEAR);
 
-        //Save a new user
-        userDao.saveUsers(1, "USER1");
+        UserService userService = new UserService();
+        TicketService ticketService = new TicketService();
 
-        //fetch all users with id equal 1
-        System.out.println("=============USERS=============");
-        userDao.fetchUsers(1);
+        //Create a new user
+        userService.createUser(user);
 
-        //Save a new ticket
-        ticketDao.saveTickets(1, 1, TicketType.DAY);
+        //get the user with id equal 1
+        System.out.println(userService.findUser(1));
 
-        //fetch all tickets with id equal 1 and user_id equal 1
+        //Create new tickets
+        ticketService.createTicket(ticket1);
+        ticketService.createTicket(ticket2);
+
+
+        //fetch all tickets with user_id equal 1
         System.out.println("=============TICKETS=============");
-        ticketDao.fetchTickets(1, 1);
+        List<Ticket> tickets = ticketService.findTicketByUserId(1);
+        for(Ticket ticket: tickets){
+            System.out.println(ticket);
+        }
 
         //update the ticket type of the ticket with id equal 1 to the WEEK type
-        ticketDao.updateTicketType(1, TicketType.WEEK);
-        ticketDao.fetchTickets(1, 1);
+        ticketService.updateTicket(1, TicketType.WEEK);
+
+        //fetch the ticket with id equal 1
+        System.out.println(ticketService.findTicketById(1));
+
+        userService.updateUser(1,"John",TicketType.MONTH);
+        System.out.println(userService.findUser(1));
+        tickets = ticketService.findTicketByUserId(1);
+        for(Ticket ticket: tickets){
+            System.out.println(ticket);
+        }
 
         //delete all tickets with id equal 1
-        ticketDao.deleteTickets(1);
+        ticketService.deleteTicket(ticket1);
 
         //delete all users with id equal 1
-        userDao.deleteUsers(1);
-
-        connection.close();
+        userService.deleteUser(user);
     }
 }

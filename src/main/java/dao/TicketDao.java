@@ -1,44 +1,48 @@
 package dao;
 
-import data.SqlQueries;
+import entities.Ticket;
+import entities.User;
 import enums.TicketType;
+import hibernate.SessionFactoryProvider;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
+import java.util.List;
 
-public class TicketDao extends Dao{
 
-    public TicketDao(Connection connection) {
-        super(connection);
+public class TicketDao{
+
+    public void save(Ticket ticket) {
+        Session session = SessionFactoryProvider.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(ticket);
+        transaction.commit();
+        session.close();
     }
 
-    public void saveTickets(int id, int userId, TicketType ticketType) {
-        executeStatement(String.format(SqlQueries.SAVETICKETS, id, userId, ticketType.name(), LocalDate.now()));
+    public Ticket fetchTicketsById(int id) {
+        return SessionFactoryProvider.getSessionFactory().openSession().get(Ticket.class, id);
     }
 
-    public void fetchTickets(int id, int userId) throws SQLException {
-
-        ResultSet resultSet = executeQuery(String.format(SqlQueries.FETCHTICKETS, id, userId));
-
-        System.out.println("ID| User ID | Ticket Type | Creation Date");
-        System.out.println("------------------------------------------------");
-        while (resultSet != null && resultSet.next()) {
-            String columnValue = resultSet.getString("id") +
-                    " | " + resultSet.getString("user_id") +
-                    " | " + resultSet.getString("ticket_type") +
-                    " | " + resultSet.getString("creation_date");
-            System.out.println(columnValue);
-            System.out.println("------------------------------------------------");
-        }
+    public List<Ticket> fetchTicketsByUserId(int userId) {
+        return SessionFactoryProvider.getSessionFactory().openSession().createQuery("from Ticket WHERE userId = :id", Ticket.class).setParameter("id",userId).list();
     }
 
     public void updateTicketType(int id, TicketType ticketType) {
-        executeStatement(String.format(SqlQueries.UPDATETICKETTYPE, ticketType.name(), id));
+        Session session = SessionFactoryProvider.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        Ticket ticket = session.get(Ticket.class,id);
+        ticket.setTicketType(ticketType);
+        session.saveOrUpdate(ticket);
+        transaction.commit();
+        session.close();
     }
 
-    public void deleteTickets(int id) {
-        executeStatement(String.format(SqlQueries.DELETETICKETS,id));
+    public void delete(Ticket ticket) {
+        Session session = SessionFactoryProvider.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(ticket);
+        transaction.commit();
+        session.close();
     }
 }

@@ -1,35 +1,45 @@
 package dao;
-import data.SqlQueries;
 
-import java.sql.*;
-import java.time.LocalDate;
+import entities.User;
+import enums.TicketType;
+import hibernate.SessionFactoryProvider;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
-public class UserDao extends Dao {
 
-    public UserDao(Connection connection) {
-        super(connection);
+public class UserDao {
+
+    public void save(User user) {
+        Session session = SessionFactoryProvider.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(user);
+        transaction.commit();
+        session.close();
     }
 
-    public void saveUsers(int id, String name) {
-
-        executeStatement(String.format(SqlQueries.SAVEUSERS, id, name, LocalDate.now()));
+    public User fetchUser(int id) {
+        return SessionFactoryProvider.getSessionFactory().openSession().get(User.class, id);
     }
 
-    public void fetchUsers(int id) throws SQLException {
-        ResultSet resultSet = executeQuery(String.format(SqlQueries.FETCHUSERS, id));
-
-        System.out.println("ID| Name | Creation Date");
-        System.out.println("------------------------------------------------");
-        while (resultSet != null && resultSet.next()) {
-            String columnValue = resultSet.getString("id") +
-                    " | " + resultSet.getString("name") +
-                    " | " + resultSet.getString("creation_date");
-            System.out.println(columnValue);
-            System.out.println("------------------------------------------------");
-        }
+    public void updateUserAndTicket(int id, String name, TicketType ticketType) {
+        Session session = SessionFactoryProvider.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        User user = session.get(User.class, id);
+        user.setName(name);
+        session.saveOrUpdate(user);
+        session.createQuery("UPDATE Ticket SET ticketType=:type WHERE userId=:id")
+                .setParameter("type", ticketType)
+                .setParameter("id", id)
+                .executeUpdate();
+        transaction.commit();
+        session.close();
     }
 
-    public void deleteUsers(int id) {
-        executeStatement(String.format(SqlQueries.DELETEUSERS, id));
+    public void delete(User user) {
+        Session session = SessionFactoryProvider.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(user);
+        transaction.commit();
+        session.close();
     }
 }
