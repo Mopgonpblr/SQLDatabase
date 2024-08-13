@@ -7,7 +7,21 @@
   <name>Archetype - Postgresqldb</name>
   <url>http://maven.apache.org</url>
 
+  <repositories>
+    <repository>
+      <id>redshift</id>
+      <url>http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release</url>
+    </repository>
+  </repositories>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.3</version>
+    </dependency>
+
+  </dependencies>
 
 
 </project>
