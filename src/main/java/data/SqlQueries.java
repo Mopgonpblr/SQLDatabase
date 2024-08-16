@@ -1,14 +1,13 @@
 package data;
 
-import java.time.LocalDate;
-
 public class SqlQueries {
-    public static final String SAVEUSERS = "INSERT INTO users VALUES (%d,'%s','%s');";
-    public static final String FETCHUSERS = "SELECT * FROM users WHERE id = %d;";
-    public static final String DELETEUSERS = "DELETE FROM users WHERE EXISTS (SELECT * FROM users WHERE id = %d);";
+    public static final String SAVE_USERS = "INSERT INTO users VALUES (?, ?, ?);";
+    public static final String FETCH_USERS = "SELECT * FROM users WHERE id = ?;";
+    public static final String DELETE_USERS = "DELETE FROM users WHERE EXISTS (SELECT * FROM users WHERE id = ?);";
 
-    public static final String SAVETICKETS = "INSERT INTO tickets VALUES (%d, %d, '%s', '%s');";
-    public static final String FETCHTICKETS = "SELECT * from tickets WHERE id = %d AND user_id = %d;";
-    public static final String UPDATETICKETTYPE = "UPDATE tickets SET ticket_type ='%s' WHERE id = %d;";
-    public static final String DELETETICKETS = "DELETE FROM tickets WHERE EXISTS (SELECT * FROM tickets WHERE id = %d);";
+    public static final String SAVE_TICKETS = "INSERT INTO tickets VALUES (?, ?, ?::ticket_type, ?);";
+    public static final String FETCH_TICKETS_BY_ID = "SELECT * from tickets WHERE id = ?;";
+    public static final String FETCH_TICKETS_BY_USER_ID = "SELECT * from tickets WHERE user_id = ?;";
+    public static final String UPDATE_TICKET_TYPE = "UPDATE tickets SET ticket_type = ?::ticket_type WHERE id = ?;";
+    public static final String DELETE_TICKETS = "DELETE FROM tickets WHERE EXISTS (SELECT * FROM tickets WHERE id = ?);";
 }

@@ -1,26 +1,35 @@
 package dao;
+
 import data.SqlQueries;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 
-public class UserDao extends Dao {
+public class UserDao{
 
-    public UserDao(Connection connection) {
-        super(connection);
+    private final DataSource dataSource;
+
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public void saveUsers(int id, String name) {
-
-        executeStatement(String.format(SqlQueries.SAVEUSERS, id, name, LocalDate.now()));
+    public void saveUsers(int id, String name) throws SQLException {
+        PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(SqlQueries.SAVE_USERS);
+        preparedStatement.setInt(1, id);
+        preparedStatement.setString(2, name);
+        preparedStatement.setDate(3, Date.valueOf(LocalDate.now()));
+        preparedStatement.execute();
     }
 
     public void fetchUsers(int id) throws SQLException {
-        ResultSet resultSet = executeQuery(String.format(SqlQueries.FETCHUSERS, id));
-
-        System.out.println("ID| Name | Creation Date");
-        System.out.println("------------------------------------------------");
+        PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(SqlQueries.FETCH_USERS);
+        preparedStatement.setInt(1, id);
+        ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet != null && resultSet.next()) {
+            System.out.println("ID| Name | Creation Date");
+            System.out.println("------------------------------------------------");
+
             String columnValue = resultSet.getString("id") +
                     " | " + resultSet.getString("name") +
                     " | " + resultSet.getString("creation_date");
@@ -29,7 +38,10 @@ public class UserDao extends Dao {
         }
     }
 
-    public void deleteUsers(int id) {
-        executeStatement(String.format(SqlQueries.DELETEUSERS, id));
+
+    public void deleteUsers(int id) throws SQLException  {
+        PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(SqlQueries.DELETE_USERS);
+        preparedStatement.setInt(1, id);
+        preparedStatement.execute();
     }
 }
