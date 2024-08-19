@@ -2,14 +2,20 @@ import dao.ContextConfiguration;
 import dao.TicketDao;
 import dao.UserDao;
 import enums.TicketType;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
 
-public class Postgresqldb {
+@SpringBootApplication
+public class Main {
     public static void main(String[] args) throws SQLException {
 
-        UserDao userDao = new UserDao(ContextConfiguration.dataSource());
-        TicketDao ticketDao = new TicketDao(ContextConfiguration.dataSource());
+        AnnotationConfigApplicationContext context
+                = new AnnotationConfigApplicationContext(ContextConfiguration.class);
+
+        UserDao userDao = context.getBean("userDao", UserDao.class);
+        TicketDao ticketDao = context.getBean("ticketDao", TicketDao.class);
 
         //Save a new user
         userDao.saveUsers(1, "USER1");

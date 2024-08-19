@@ -1,13 +1,16 @@
 package dao;
 
 import org.postgresql.ds.PGSimpleDataSource;
+import org.springframework.context.annotation.*;
 
 import javax.sql.DataSource;
 
-import org.springframework.core.*;
 
+@Configuration
+@ComponentScan
 public class ContextConfiguration {
 
+    @Bean
     public static DataSource dataSource() {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
         dataSource.setUser("username");
